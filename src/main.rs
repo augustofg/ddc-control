@@ -59,7 +59,14 @@ fn main() {
                          .required(true)))
         .get_matches();
 
-    let monitor = parse::<usize>(matches.value_of("monitor-number").unwrap()).unwrap();
+    let monitor = match parse::<usize>(matches.value_of("monitor-number").unwrap()) {
+        Ok(num) => num,
+        Err(e) => {
+            eprintln!("Invalid argument for -m / --monitor: {}", e);
+            std::process::exit(1)
+        },
+    };
+
 
     if monitor < 1 {
         eprintln!("Monitor number should be greater than zero.");
@@ -68,11 +75,29 @@ fn main() {
 
     let (feature, value, write) =
         if let Some(feature_arg) = matches.subcommand_matches("get-vcp") {
-            (parse::<u8>(feature_arg.value_of("FEATURE").unwrap()).unwrap(), 0u16, false)
+            (match parse::<u8>(feature_arg.value_of("FEATURE").unwrap()) {
+                Ok(num) => num,
+                Err(e) => {
+                    eprintln!("Invalid argument for get-vcp: {}", e);
+                    std::process::exit(1)
+                },
+            }, 0u16, false)
         } else if let Some(feature_arg) = matches.subcommand_matches("set-vcp") {
-            (parse::<u8>(feature_arg.value_of("FEATURE").unwrap()).unwrap(),
-             parse::<u16>(feature_arg.value_of("VALUE").unwrap()).unwrap(), true)
-        } else {(0u8, 0u16, false)};
+            (match parse::<u8>(feature_arg.value_of("FEATURE").unwrap()) {
+                Ok(num) => num,
+                Err(e) => {
+                    eprintln!("Invalid argument for set-vcp: {}", e);
+                    std::process::exit(1)
+                },
+            },
+             match parse::<u16>(feature_arg.value_of("VALUE").unwrap()) {
+                 Ok(num) => num,
+                 Err(e) => {
+                     eprintln!("Invalid argument for set-vcp: {}", e);
+                     std::process::exit(1)
+                 },
+             }, true)
+        } else {panic!("Invalid arguments! Check the argument parsing logic.")};
 
     let mut displays = Display::enumerate();
 
