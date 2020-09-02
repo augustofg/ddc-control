@@ -26,7 +26,7 @@ extern crate clap;
 extern crate parse_int;
 
 use ddc_hi::{Ddc, Display};
-use clap::{Arg, App, SubCommand};
+use clap::{Arg, App, AppSettings, SubCommand};
 use parse_int::parse;
 
 fn main() {
@@ -40,6 +40,7 @@ fn main() {
              .value_name("NUM")
              .help("Monitor number")
              .takes_value(true))
+        .setting(AppSettings::SubcommandRequired)
         .subcommand(SubCommand::with_name("get-vcp")
                     .about("Get the VCP feature value")
                     .arg(Arg::with_name("FEATURE")
